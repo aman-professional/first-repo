@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Sweet Treats Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <h1>🍫 Sweet Treats Shop</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav" id="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Shop</a></li>
+                    <li><a href="cart.html" class="active cart-link">
+                            Cart <span id="cart-count" class="cart-badge">0</span>
+                        </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="cart-section">
+            <h2>Your Shopping Cart</h2>
+
+            <div class="cart-container">
+                <div id="cart-items" class="cart-items-list card-box">
+                    <!-- Cart items will be loaded here -->
+                    <p style="text-align: center; padding: 2rem;">Loading your delicious treats...</p>
+                </div>
+
+                <div class="cart-summary" id="cart-summary">
+                    <!-- Summary will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Sweet Treats Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+        });
+
+        function loadCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartSummaryContainer = document.getElementById('cart-summary');
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="text-align: center; padding: 3rem;">Your cart is empty. Why not add some chocolates?</p>';
+                cartSummaryContainer.innerHTML = '<div class="card-box"><a href="products.html" class="btn btn-primary btn-block">Go to Shop</a></div>';
+                return;
+            }
+
+            let total = 0;
+
+            cartItemsContainer.innerHTML = cart.map((item) => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h3>${item.name}</h3>
+                             <p class="price" style="font-size: 1rem; color: var(--accent-color); font-weight: 700;">Rs. ${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <div class="quantity-stepper">
+                                <button onclick="changeQuantity('${item.productId}', -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button onclick="changeQuantity('${item.productId}', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="cart-item-subtotal">
+                            <p style="font-weight: 800; font-size: 1.2rem; color: var(--primary-color);">Rs. ${(item.price * item.quantity).toFixed(2)}</p>
+                            <button class="btn btn-remove" onclick="removeFromCart('${item.productId}')" style="margin-top: 10px; font-size: 0.8rem; padding: 0.4rem 0.8rem;">Remove</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            cartSummaryContainer.innerHTML = `
+                <div class="card-box summary-box">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 0.5rem;">Order Summary</h3>
+                    <p style="display: flex; justify-content: space-between; margin-bottom: 1rem;"><span>Total Items:</span> <strong>${cart.reduce((sum, item) => sum + item.quantity, 0)}</strong></p>
+                    <div style="margin: 1.5rem 0; padding-top: 1rem; border-top: 2px solid #f0f0f0;">
+                         <p style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 1.1rem; font-weight: 600;">Total Amount:</span>
+                            <span style="font-size: 1.5rem; font-weight: 800; color: var(--accent-color);">Rs. ${total.toFixed(2)}</span>
+                         </p>
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="goToCheckout()" style="margin-bottom: 1rem;">Proceed to Checkout</button>
+                    <a href="products.html" class="btn btn-secondary btn-block">Add More Items</a>
+                </div>
+            `;
+        }
+
+        function changeQuantity(productId, delta) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const item = cart.find(item => item.productId === productId);
+            if (item) {
+                item.quantity = (item.quantity || 1) + delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.productId !== productId);
+                }
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            if (typeof updateCartCount === 'function') updateCartCount();
+            loadCart();
+        }
+
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(item => item.productId !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            if (typeof updateCartCount === 'function') updateCartCount();
+            loadCart();
+        }
+
+        function goToCheckout() {
+            window.location.href = 'checkout.html';
+        }
+    </script>
+</body>
+
+</html>

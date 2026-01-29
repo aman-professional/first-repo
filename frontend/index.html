@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Treats Shop - Premium Chocolates</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <h1>🍫 Sweet Treats Shop</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav" id="nav-menu">
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="products.html">Shop</a></li>
+                    <li><a href="cart.html" class="cart-link">
+                            Cart <span id="cart-count" class="cart-badge">0</span>
+                        </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Indulge in Your Sweetest Desires</h2>
+            <p>Experience the finest collection of handcrafted and premium chocolates delivered straight to your
+                doorstep.</p>
+            <a href="products.html" class="btn btn-primary">Shop Now</a>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="feature-item">
+                <h3>🍫 Best Quality</h3>
+                <p>We source only the finest cocoa and premium brands for your satisfaction.</p>
+            </div>
+            <div class="feature-item">
+                <h3>🚚 Fast Delivery</h3>
+                <p>Craving chocolate? We deliver your favorites across Kathmandu within hours.</p>
+            </div>
+            <div class="feature-item">
+                <h3>💰 Best Price</h3>
+                <p>Authentic premium chocolates at the most competitive prices in Nepal.</p>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="featured-section">
+            <h2 class="section-title">Featured Flavors</h2>
+            <div class="products-grid" id="featured-products">
+                <!-- Featured products will be loaded by app.js -->
+                <p style="text-align: center; grid-column: 1/-1;">Loading sweet surprises...</p>
+            </div>
+            <div style="text-align: center; margin-top: 4rem;">
+                <a href="products.html" class="btn btn-secondary">View All Collection</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Sweet Treats Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>

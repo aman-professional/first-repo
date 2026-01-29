@@ -1,0 +1,128 @@
+﻿Server running on port 5000
+node : MongoDB 
+connection error: 
+MongooseError: The 
+`uri` parameter to 
+`openUri()` must be 
+a string, got 
+"undefined". Make 
+sure the first 
+parameter to 
+`mongoose.connect()` 
+or `mongoose.createCo
+nnection()` is a 
+string.
+At line:1 char:1
++ node server.js 
+2>&1 | Out-File 
+-FilePath 
+server_log.txt 
+-Encoding utf ...
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (MongoDB   
+  connect...)` is    
+ a string.:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+    at NativeConnecti
+on.createClient (C:\U
+sers\LOQ\Documents\wo
+rkshoplab is\backend\
+node_modules\mongoose
+\lib\drivers\node-mon
+godb-native\connectio
+n.js:230:11)
+    at NativeConnecti
+on.openUri (C:\Users\
+LOQ\Documents\worksho
+plab is\backend\node_
+modules\mongoose\lib\
+connection.js:1075:34
+)
+    at 
+Mongoose.connect (C:\
+Users\LOQ\Documents\w
+orkshoplab is\backend
+\node_modules\mongoos
+e\lib\mongoose.js:451
+:15)
+    at 
+Object.<anonymous> (C
+:\Users\LOQ\Documents
+\workshoplab is\backe
+nd\server.js:30:10)
+    at 
+Module._compile (node
+:internal/modules/cjs
+/loader:1761:14)
+    at Object..js (no
+de:internal/modules/c
+js/loader:1893:10)
+    at Module.load (n
+ode:internal/modules/
+cjs/loader:1481:32)
+    at Module._load (
+node:internal/modules
+/cjs/loader:1300:12)
+    at TracingChannel
+.traceSync (node:diag
+nostics_channel:328:1
+4)
+    at 
+wrapModuleLoad (node:
+internal/modules/cjs/
+loader:245:24)
+SyntaxError: 
+Expected property 
+name or '}' in JSON 
+at position 1 (line 
+1 column 2)
+    at JSON.parse 
+(<anonymous>)
+    at parse (C:\User
+s\LOQ\Documents\works
+hoplab is\backend\nod
+e_modules\body-parser
+\lib\types\json.js:72
+:19)
+    at C:\Users\LOQ\D
+ocuments\workshoplab 
+is\backend\node_modul
+es\body-parser\lib\re
+ad.js:162:18
+    at AsyncResource.
+runInAsyncScope (node
+:async_hooks:214:14)
+    at 
+invokeCallback (C:\Us
+ers\LOQ\Documents\wor
+kshoplab is\backend\n
+ode_modules\raw-body\
+index.js:238:16)
+    at done (C:\Users
+\LOQ\Documents\worksh
+oplab is\backend\node
+_modules\raw-body\ind
+ex.js:227:7)
+    at IncomingMessag
+e.onEnd (C:\Users\LOQ
+\Documents\workshopla
+b is\backend\node_mod
+ules\raw-body\index.j
+s:287:7)
+    at 
+IncomingMessage.emit 
+(node:events:508:28)
+    at endReadableNT 
+(node:internal/stream
+s/readable:1701:12)
+    at process.proces
+sTicksAndRejections (
+node:internal/process
+/task_queues:89:21)

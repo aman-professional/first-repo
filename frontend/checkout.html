@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Sweet Treats Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <h1>🍫 Sweet Treats Shop</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav" id="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Shop</a></li>
+                    <li><a href="cart.html" class="cart-link">
+                            Cart <span id="cart-count" class="cart-badge">0</span>
+                        </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="checkout-section">
+            <h2 style="margin-bottom: 2.5rem;">Secure Checkout</h2>
+
+            <div class="checkout-container">
+                <!-- Order Summary -->
+                <div class="order-summary-box card-box">
+                    <h3 style="border-bottom: 2px solid #f0f0f0; padding-bottom: 0.8rem;">Order Details</h3>
+                    <div id="order-items" style="margin: 1.5rem 0;">
+                        <!-- Cart items will be shown here -->
+                    </div>
+                    <div class="summary-total" style="border-top: 2px solid #f0f0f0; padding-top: 1.5rem;">
+                        <p style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 1.1rem; font-weight: 600;">Total Amount:</span>
+                            <span style="font-size: 1.8rem; font-weight: 800; color: var(--accent-color);">Rs. <span
+                                    id="total-amount">0.00</span></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Checkout Form -->
+                <div class="checkout-form-box card-box">
+                    <h3 style="border-bottom: 2px solid #f0f0f0; padding-bottom: 0.8rem;">Delivery Address</h3>
+                    <form id="checkout-form" style="margin-top: 1.5rem;">
+                        <!-- Full Name -->
+                        <div class="form-group">
+                            <label for="name">Recipient Name *</label>
+                            <input type="text" id="name" required placeholder="Who are we treating?"
+                                autocomplete="name">
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" required placeholder="Best number to reach you"
+                                pattern="[0-9\-\+\s\(\)]+" autocomplete="tel">
+                        </div>
+
+                        <!-- Location Section -->
+                        <div class="form-group">
+                            <label>Delivery Location *</label>
+                            <button type="button" class="btn btn-location" id="get-location-btn"
+                                style="border-radius: 12px; background: #fdfaf5; border: 1px solid #ddd; color: var(--primary-color);">
+                                📍 Capture My Live Location
+                            </button>
+                            <p id="location-status" style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;"></p>
+                        </div>
+
+                        <!-- Map Preview -->
+                        <div id="map-preview" class="map-preview"
+                            style="border: 1px solid #eee; background: #fafafa; border-radius: 12px; overflow: hidden; height: 250px;">
+                            <p style="text-align: center; color: #aaa; font-style: italic; font-size: 0.9rem;">Map will
+                                appear here</p>
+                        </div>
+
+                        <!-- Hidden Fields for Coordinates -->
+                        <input type="hidden" id="latitude" value="">
+                        <input type="hidden" id="longitude" value="">
+
+                        <!-- Payment Method Section -->
+                        <div class="form-group" style="margin-top: 2rem;">
+                            <label style="margin-bottom: 1rem;">Payment Method *</label>
+                            <div class="payment-methods-grid" style="display: flex; flex-direction: column; gap: 10px;">
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="COD" checked
+                                        onclick="togglePaymentUI('COD')">
+                                    <span class="option-content">
+                                        <strong>💵 Cash on Delivery</strong>
+                                        <small>Pay at your doorstep</small>
+                                    </span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="eSewa" onclick="togglePaymentUI('eSewa')">
+                                    <span class="option-content">
+                                        <strong>📱 eSewa Mobile Wallet</strong>
+                                        <small>Fast and secure online pay</small>
+                                    </span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment" value="QR" onclick="togglePaymentUI('QR')">
+                                    <span class="option-content">
+                                        <strong>🔳 Online QR Scan</strong>
+                                        <small>Scan with any banking app</small>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Mock QR Display -->
+                        <div id="qr-display" class="mock-payment-area"
+                            style="display: none; background: #fffcf5; border: 1px dashed var(--accent-color);">
+                            <p style="margin-bottom: 15px; font-weight: 700; color: var(--primary-color);">Scan QR to
+                                pay Rs. <span id="qr-amount">0</span></p>
+                            <div
+                                style="background: white; padding: 20px; border-radius: 15px; box-shadow: var(--shadow-sm); border: 1px solid #eee;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=SweetTreatsShop_Payment"
+                                    alt="Payment QR" style="width: 180px; height: 180px;">
+                            </div>
+                            <p style="margin-top: 15px; font-size: 0.8rem; color: #7a6e67; font-weight: 500;">✓
+                                Supported by all major Banks & Wallets</p>
+                        </div>
+
+                        <!-- Mock eSewa Display -->
+                        <div id="esewa-display" class="mock-payment-area"
+                            style="display: none; background: #ebf5e9; border: 1px dashed #4caf50;">
+                            <div
+                                style="background: #4caf50; color: white; padding: 25px; border-radius: 15px; text-align: center; width: 100%; box-shadow: var(--shadow-sm);">
+                                <h4 style="margin-bottom: 8px; font-weight: 700; font-size: 1.2rem;">eSewa Portal</h4>
+                                <p style="font-size: 1rem; opacity: 0.9;">Payable: <strong>Rs. <span
+                                            id="esewa-amount">0</span></strong></p>
+                                <button type="button" class="btn"
+                                    style="background: white; color: #4caf50; margin-top: 15px; font-weight: 800; width: 100%;">
+                                    Verify Transaction
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Payment Proof Upload (Compulsory for Online) -->
+                        <div id="proof-upload-section" class="form-group"
+                            style="display: none; margin-top: 2rem; padding: 20px; background: #fff8f0; border-radius: 15px; border: 1px solid #ffe0b2;">
+                            <label for="payment-proof"
+                                style="color: #bf360c; display: flex; align-items: center; gap: 8px;">
+                                <span>📤 Upload Payment Proof *</span>
+                            </label>
+                            <p style="font-size: 0.75rem; color: #7a6e67; margin-bottom: 15px; line-height: 1.4;">Please
+                                upload a screenshot of your successful transaction to confirm your order.</p>
+                            <input type="file" id="payment-proof" accept="image/*" class="form-control"
+                                style="border: 1px solid #e0e0e0; background: white; padding: 10px;">
+                            <div id="proof-preview"
+                                style="margin-top: 15px; display: none; text-align: center; background: white; padding: 10px; border-radius: 10px; border: 1px solid #eee;">
+                                <p style="font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: #4e342e;">
+                                    Screenshot Preview:</p>
+                                <img id="proof-img-preview" src=""
+                                    style="width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div style="margin-top: 3rem;">
+                            <button type="submit" class="btn btn-primary btn-block" id="submit-order"
+                                style="padding: 1.2rem; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(196, 140, 70, 0.4);">
+                                Confirm & Place Order
+                            </button>
+                            <p style="text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 15px;">By placing
+                                the order, you agree to our Terms of Service</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Sweet Treats Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDummyKeyForLocalhost"></script>
+    <script src="js/app.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sweet Treats Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* IN-PAGE PRINT OVERRIDE FOR EXTRA RELIABILITY */
+        @media print {
+            body {
+                background: #fff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .navbar,
+            .footer,
+            main,
+            .admin-tabs,
+            .admin-section,
+            .btn,
+            .menu-toggle,
+            header,
+            .admin-controls,
+            .order-card-admin {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                overflow: hidden !important;
+            }
+
+            #invoice-print-area {
+                display: block !important;
+                visibility: visible !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+
+            #invoice-print-area * {
+                visibility: visible !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="display: none;">
+    <script>
+        // Simple Admin Protection
+        const ADMIN_PASS = "admin123";
+        const entry = prompt("Enter Admin Password:");
+        if (entry !== ADMIN_PASS) {
+            alert("Access Denied!");
+            window.location.href = "index.html";
+        } else {
+            document.body.style.display = "block";
+        }
+    </script>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <h1>🍫 Admin Dashboard</h1>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav" id="nav-menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Shop</a></li>
+                    <li><a href="admin.html" class="active">Orders</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <div class="admin-tabs">
+                <button class="tab-btn active" id="orders-btn" onclick="showTab('orders')">📦 Active</button>
+                <button class="tab-btn" id="delivered-btn" onclick="showTab('delivered')">✅ Delivered</button>
+                <button class="tab-btn" id="cancelled-btn" onclick="showTab('cancelled')">✖ Cancelled</button>
+                <button class="tab-btn" id="products-btn" onclick="showTab('products')">🍫 Inventory</button>
+            </div>
+
+            <!-- Active Orders Tab -->
+            <div id="orders-tab" class="tab-content active">
+                <h2 style="margin-bottom: 2rem;">Active Customer Orders</h2>
+                <div class="admin-controls" style="margin-bottom: 2rem;">
+                    <button class="btn btn-primary" onclick="fetchOrders()">Refresh Orders List</button>
+                </div>
+                <div class="orders-container">
+                    <div id="orders-list" class="orders-list">
+                        <p style="text-align: center; padding: 2rem;">Loading orders...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivered Orders Tab -->
+            <div id="delivered-tab" class="tab-content">
+                <h2 style="margin-bottom: 2rem;">Successfully Delivered Orders</h2>
+                <div class="admin-controls" style="margin-bottom: 2rem;">
+                    <button class="btn btn-primary" onclick="fetchOrders()">Refresh History</button>
+                </div>
+                <div id="delivered-orders-list" class="orders-list">
+                    <p style="text-align: center; padding: 2rem;">No delivered orders yet.</p>
+                </div>
+            </div>
+
+            <!-- Cancelled Orders Tab -->
+            <div id="cancelled-tab" class="tab-content">
+                <h2 style="margin-bottom: 2rem;">Cancelled Orders History</h2>
+                <div class="admin-controls" style="margin-bottom: 2rem;">
+                    <button class="btn btn-primary" onclick="fetchOrders()">Refresh Cancelled List</button>
+                </div>
+                <div id="cancelled-orders-list" class="orders-list">
+                    <p style="text-align: center; padding: 2rem;">No cancelled orders yet.</p>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="products-tab" class="tab-content">
+                <h2 style="margin-bottom: 2rem;">Manage Inventory</h2>
+                <div class="add-product-form card-box">
+                    <h3>Add New Chocolate</h3>
+                    <form id="add-product-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div class="form-group">
+                                <label>Chocolate Name</label>
+                                <input type="text" id="p-name" placeholder="e.g. Dairy Milk Silk" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Price (Rs.)</label>
+                                <input type="number" id="p-price" placeholder="0.00" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Short Description</label>
+                            <input type="text" id="p-description" placeholder="Describe the taste..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input type="text" id="p-image" placeholder="Unsplash URL recommended" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="add-product-btn">Add to
+                            Stock</button>
+                    </form>
+                </div>
+
+                <div class="products-list-admin" style="margin-top: 4rem;">
+                    <h3 style="margin-bottom: 2rem; text-align: center;">Current Inventory</h3>
+                    <div id="admin-products-grid" class="admin-products-grid"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Professional Nepalese Invoice (Cash Memo) -->
+    <div id="invoice-print-area" style="display: none; background: #fff; padding: 20px;">
+        <div
+            style="border: 2px solid #000; padding: 30px; font-family: 'Times New Roman', serif; color: #000; background: #fff;">
+
+            <!-- PAN & MEMO HEADER -->
+            <div
+                style="display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; margin-bottom: 5px;">
+                <span>PAN No: 302145876</span>
+                <span style="border: 1px solid #000; padding: 2px 10px;">CASH MEMO</span>
+            </div>
+
+            <!-- SHOP DETAILS -->
+            <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px solid #000; padding-bottom: 15px;">
+                <h1
+                    style="font-size: 38px; margin: 0; text-transform: uppercase; letter-spacing: 3px; font-weight: 900;">
+                    Sweet Treats Shop</h1>
+                <p style="font-size: 18px; margin: 5px 0; font-weight: bold;">Kathmandu, Nepal</p>
+                <p style="font-size: 14px; margin: 2px 0;">Ph: +977-9800000000 | Email: info@sweettreats.com</p>
+            </div>
+
+            <!-- CUSTOMER INFO -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; line-height: 1.8;">
+                <div style="flex: 1;">
+                    <p style="margin: 0;"><strong>Buyer's Name:</strong> <span id="inv-cust-name"
+                            style="border-bottom: 1px dotted #000; padding: 0 10px; min-width: 250px; display: inline-block;"></span>
+                    </p>
+                    <p style="margin: 0;"><strong>Phone No:</strong> <span id="inv-phone"
+                            style="border-bottom: 1px dotted #000; padding: 0 10px; min-width: 250px; display: inline-block;"></span>
+                    </p>
+                    <p style="margin: 0;"><strong>Address:</strong> <span
+                            style="border-bottom: 1px dotted #000; padding: 0 10px; min-width: 250px; display: inline-block;">Kathmandu,
+                            Nepal</span></p>
+                </div>
+                <div style="text-align: right; width: 220px;">
+                    <p style="margin: 0;"><strong>Bill No:</strong> <span id="inv-id" style="font-weight: bold;"></span>
+                    </p>
+                    <p style="margin: 0;"><strong>Date:</strong> <span id="inv-date"></span></p>
+                </div>
+            </div>
+
+            <!-- BILL TABLE -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
+                <thead>
+                    <tr style="background: #f0f0f0; -webkit-print-color-adjust: exact;">
+                        <th style="border: 1px solid #000; padding: 12px 8px; width: 50px; text-align: center;">S.N.
+                        </th>
+                        <th style="border: 1px solid #000; padding: 12px 8px; text-align: left;">Description of Goods
+                        </th>
+                        <th style="border: 1px solid #000; padding: 12px 8px; width: 70px; text-align: center;">Qty</th>
+                        <th style="border: 1px solid #000; padding: 12px 8px; width: 110px; text-align: right;">Rate
+                            (Rs.)</th>
+                        <th style="border: 1px solid #000; padding: 12px 8px; width: 130px; text-align: right;">Amount
+                            (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody id="inv-items-body">
+                    <!-- Dynamic rows -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" rowspan="2" style="border: 1px solid #000; padding: 15px; vertical-align: top;">
+                            <p style="margin: 0; font-weight: bold; font-size: 14px;">Amount in words:</p>
+                            <p style="margin: 5px 0 0 0; text-transform: capitalize; font-style: italic;"><span
+                                    id="inv-words"></span> Rupees Only.</p>
+                        </td>
+                        <td
+                            style="border: 1px solid #000; padding: 10px; text-align: right; font-weight: bold; font-size: 16px;">
+                            Grand Total</td>
+                        <td
+                            style="border: 1px solid #000; padding: 10px; text-align: right; font-weight: bold; font-size: 18px;">
+                            Rs. <span id="inv-total"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"
+                            style="border: 1px solid #000; padding: 10px; background: #fafafa; -webkit-print-color-adjust: exact;">
+                            <p style="margin: 0; font-size: 12px; font-weight: bold; text-align: center;">Authorized
+                                Signature</p>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- FOOTER SIGNATURES -->
+            <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div style="text-align: center; width: 220px;">
+                    <div style="border-top: 1px solid #000; margin-bottom: 8px;"></div>
+                    <p style="margin: 0; font-size: 14px; font-weight: bold;">Buyer's Signature</p>
+                </div>
+                <div style="text-align: center; width: 220px;">
+                    <p style="font-style: italic; margin-bottom: 30px; font-size: 12px;">E.& O.E.</p>
+                    <div style="border-top: 1px solid #000; margin-bottom: 8px;"></div>
+                    <p style="margin: 0; font-size: 14px; font-weight: bold;">For: Sweet Treats Shop</p>
+                </div>
+            </div>
+
+            <!-- THANK YOU MESSAGE -->
+            <div
+                style="text-align: center; margin-top: 40px; font-size: 13px; font-style: italic; border-top: 1px dashed #000; padding-top: 15px;">
+                "Thank you for choosing Sweet Treats Shop. We look forward to serving you again."
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Sweet Treats Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        const API_BASE = (typeof API_URL !== 'undefined') ? API_URL : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && !window.location.origin.includes('5000') ? 'http://localhost:5000/api' : '/api');
+
+        let allOrdersCached = [];
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            document.getElementById(tab + '-btn').classList.add('active');
+            if (tab === 'products') fetchAdminProducts();
+            if (tab === 'orders' || tab === 'cancelled' || tab === 'delivered') fetchOrders();
+        }
+
+        async function deliverOrder(id) {
+            if (!confirm("Is this order successfully delivered?")) return;
+            try {
+                const res = await fetch(`${API_BASE}/orders/${id}/deliver`, { method: 'PATCH' });
+                if (res.ok) { alert('Order marked as Delivered!'); fetchOrders(); }
+            } catch (err) { console.error(err); }
+        }
+
+        async function cancelOrder(id) {
+            const reason = prompt("Enter reason for cancellation:");
+            if (reason === null) return;
+            try {
+                const res = await fetch(`${API_BASE}/orders/${id}/cancel`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                if (res.ok) { alert('Order cancelled.'); fetchOrders(); }
+            } catch (err) { console.error(err); }
+        }
+
+        async function verifyPayment(id) {
+            if (!confirm("Mark this payment as Verified?")) return;
+            try {
+                const res = await fetch(`${API_BASE}/orders/${id}/verify-payment`, { method: 'PATCH' });
+                if (res.ok) { alert('Verified!'); fetchOrders(); }
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchOrders() {
+            const ordersList = document.getElementById('orders-list');
+            const cancelledList = document.getElementById('cancelled-orders-list');
+            const deliveredList = document.getElementById('delivered-orders-list');
+
+            try {
+                const response = await fetch(`${API_BASE}/orders`);
+                const orders = await response.json();
+                allOrdersCached = orders;
+
+                const activeOrders = orders.filter(o => o.status === 'pending');
+                const cancelledOrders = orders.filter(o => o.status === 'cancelled');
+                const deliveredOrders = orders.filter(o => o.status === 'delivered');
+
+                ordersList.innerHTML = activeOrders.length ? activeOrders.map((o, i) => renderOrderCard(o, i, 'active')).reverse().join('') : '<p style="text-align: center; padding: 2rem;">No active orders.</p>';
+                deliveredList.innerHTML = deliveredOrders.length ? deliveredOrders.map((o, i) => renderOrderCard(o, i, 'delivered')).join('') : '<p style="text-align: center; padding: 2rem;">No delivered orders.</p>';
+
+                cancelledList.innerHTML = cancelledOrders.length ? cancelledOrders.map(o => `
+                    <div class="order-card-admin" style="opacity: 0.7; border-left-color: #777;">
+                        <h3 style="margin-bottom: 1rem;">Order #${o._id.substring(o._id.length - 6).toUpperCase()} - ${o.name}</h3>
+                        <p style="padding: 10px; background: #fff5f5; border-radius: 8px; color: #d32f2f;">Reason: ${o.cancellationReason || 'No reason'}</p>
+                    </div>`).reverse().join('') : '<p style="text-align: center; padding: 2rem;">No cancellations.</p>';
+            } catch (err) { console.error(err); }
+        }
+
+        function renderOrderCard(order, index, type) {
+            const itemsText = order.cartItems.map(item => `${item.quantity}x ${item.name}`).join(', ');
+            const mapLink = `https://www.google.com/maps?q=${order.location.latitude},${order.location.longitude}`;
+            const shortId = order._id.substring(order._id.length - 6).toUpperCase();
+            const isVerified = order.paymentStatus === 'Verified';
+
+            return `
+                <div class="order-card-admin" style="${type === 'delivered' ? 'border-left-color: #4caf50;' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="color: var(--primary-color); font-size: 1.3rem;">Order #${shortId} - ${order.name}</h3>
+                            <span style="font-size: 0.85rem; color: #7a6e67;">${new Date(order.createdAt).toLocaleString()}</span>
+                        </div>
+                        <span style="background: ${isVerified ? '#4caf50' : '#c48c46'}; color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; font-weight: 700;">
+                            ${order.paymentMethod} | ${order.paymentStatus}
+                        </span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <p><strong>📞 Phone:</strong> ${order.phone}</p>
+                            <p><strong>📦 Items:</strong> ${itemsText}</p>
+                            <p><strong>💰 Total:</strong> Rs. ${order.totalAmount.toFixed(2)}</p>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <a href="${mapLink}" target="_blank" class="btn btn-secondary" style="flex: 1; font-size: 0.85rem; padding: 0.6rem;">📍 Map</a>
+                                <button onclick="generateInvoice('${order._id}')" class="btn btn-primary" style="flex: 1; font-size: 0.85rem; padding: 0.6rem; background: #333;">📄 Generate Bill</button>
+                            </div>
+                        </div>
+                        ${order.paymentProof ? `<div><img src="${order.paymentProof}" style="width: 100%; max-height: 180px; border-radius: 10px; border: 1px solid #eee; object-fit: contain;" onclick="window.open(this.src)"></div>` : ''}
+                    </div>
+                    ${type === 'active' ? `
+                    <div style="display: flex; gap: 10px; margin-top: 2.5rem;">
+                        <button onclick="deliverOrder('${order._id}')" class="btn btn-primary" style="flex: 2; background: #4caf50;">✅ Mark Delivered</button>
+                        ${(!isVerified && order.paymentMethod !== 'COD') ? `<button onclick="verifyPayment('${order._id}')" class="btn btn-primary" style="flex: 1; background: #2196f3;">💳 Verify</button>` : ''}
+                        <button onclick="cancelOrder('${order._id}')" class="btn btn-remove" style="flex: 1; background: #f44336;">✖ Cancel</button>
+                    </div>` : `<div style="margin-top: 2rem; padding: 10px; background: #ebf5e9; border-radius: 8px; color: #2e7d32; text-align: center; font-weight: bold;">✓ Delivered</div>`}
+                </div>`;
+        }
+
+        function generateInvoice(orderId) {
+            const order = allOrdersCached.find(o => o._id === orderId);
+            if (!order) return;
+
+            document.getElementById('inv-cust-name').textContent = order.name;
+            document.getElementById('inv-phone').textContent = order.phone;
+            document.getElementById('inv-id').textContent = 'ST' + orderId.substring(orderId.length - 6).toUpperCase();
+            document.getElementById('inv-date').textContent = new Date(order.createdAt).toLocaleDateString();
+            document.getElementById('inv-total').textContent = order.totalAmount.toFixed(2);
+            document.getElementById('inv-words').textContent = numberToWords(Math.round(order.totalAmount));
+
+            const itemsBody = document.getElementById('inv-items-body');
+            itemsBody.innerHTML = order.cartItems.map((item, i) => `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 10px; text-align: center;">${i + 1}</td>
+                    <td style="border: 1px solid #000; padding: 10px; text-align: left;">${item.name}</td>
+                    <td style="border: 1px solid #000; padding: 10px; text-align: center;">${item.quantity}</td>
+                    <td style="border: 1px solid #000; padding: 10px; text-align: right;">${item.price.toFixed(2)}</td>
+                    <td style="border: 1px solid #000; padding: 10px; text-align: right;">${(item.price * item.quantity).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            for (let i = order.cartItems.length; i < 10; i++) {
+                itemsBody.innerHTML += '<tr style="height: 35px;"><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td><td style="border: 1px solid #000;"></td></tr>';
+            }
+            window.print();
+        }
+
+        function numberToWords(num) {
+            const a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen '];
+            const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+            let n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return '';
+            let str = '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+            return str.trim();
+        }
+
+        async function fetchAdminProducts() {
+            const grid = document.getElementById('admin-products-grid');
+            try {
+                const res = await fetch(`${API_BASE}/products`);
+                const products = await res.json();
+                grid.innerHTML = products.map(p => `
+                    <div class="product-card">
+                        <div class="product-image"><img src="${p.image}"></div>
+                        <div class="product-info">
+                            <h3>${p.name}</h3>
+                            <p class="price">Rs. ${p.price.toFixed(2)}</p>
+                            <button class="btn btn-remove" onclick="deleteProduct('${p._id}')" style="width: 100%; background: #f44336; color: white;">Delete</button>
+                        </div>
+                    </div>`).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Delete this product?')) return;
+            try { await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' }); fetchAdminProducts(); } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('add-product-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('add-product-btn');
+            btn.disabled = true; btn.textContent = 'Adding...';
+            try {
+                const res = await fetch(`${API_BASE}/products`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: document.getElementById('p-name').value, price: parseFloat(document.getElementById('p-price').value), description: document.getElementById('p-description').value, image: document.getElementById('p-image').value })
+                });
+                if (res.ok) { alert('Added!'); e.target.reset(); fetchAdminProducts(); }
+            } catch (err) { console.error(err); }
+            finally { btn.disabled = false; btn.textContent = 'Add to Stock'; }
+        });
+
+        fetchOrders();
+    </script>
+</body>
+
+</html>
