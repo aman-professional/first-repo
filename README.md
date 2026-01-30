@@ -430,6 +430,13 @@ const PORT = process.env.PORT || 3000;  // Changed from 5000
 3. Get connection string
 4. Update `server.js` with your connection string
 
+### Render Deployment:
+The project includes a root-level `package.json` that automatically handles deployment on Render.
+1. Connect your GitHub repo to Render.
+2. Render will automatically detect the root `package.json`.
+3. Use `npm run build` as the **Build Command**.
+4. Use `npm start` as the **Start Command**.
+
 ---
 
 ## 📝 npm COMMANDS
