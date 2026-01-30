@@ -82,45 +82,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         getLocationBtn.disabled = true;
-        getLocationBtn.textContent = '📍 Getting location...';
-        locationStatus.textContent = 'Requesting location permission...';
+        getLocationBtn.textContent = '📍 Getting best location...';
+        locationStatus.textContent = 'Requesting high-accuracy location...';
         locationStatus.style.color = '#666';
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
+        const successCallback = (position) => {
+            const { latitude, longitude } = position.coords; // accuracy is also available
 
-                // Store coordinates
-                latitudeInput.value = latitude;
-                longitudeInput.value = longitude;
+            // Store coordinates
+            latitudeInput.value = latitude;
+            longitudeInput.value = longitude;
 
-                // Update UI
-                getLocationBtn.textContent = '✓ Location Captured';
-                getLocationBtn.style.backgroundColor = '#4CAF50';
-                locationStatus.textContent = `✓ Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-                locationStatus.style.color = '#4CAF50';
+            // Update UI
+            getLocationBtn.textContent = '✓ Location Captured';
+            getLocationBtn.style.backgroundColor = '#4CAF50';
+            locationStatus.textContent = `✓ Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (Accuracy: ~${Math.round(position.coords.accuracy)}m)`;
+            locationStatus.style.color = '#4CAF50';
 
-                // Show map preview
-                showMapPreview(latitude, longitude);
-            },
-            (error) => {
-                getLocationBtn.disabled = false;
-                getLocationBtn.textContent = '📍 Get My Live Location';
+            // Show map preview
+            showMapPreview(latitude, longitude);
+        };
 
-                let errorMsg = 'Unable to get location. ';
-                if (error.code === error.PERMISSION_DENIED) {
-                    errorMsg += 'Please enable location permissions in your browser settings.';
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    errorMsg += 'Location information is unavailable.';
-                } else if (error.code === error.TIMEOUT) {
-                    errorMsg += 'Request timed out.';
-                } else {
-                    errorMsg += 'Unknown error occurred.';
+        const errorCallback = (error) => {
+            console.warn(`High accuracy error (${error.code}): ${error.message}`);
+
+            // If high accuracy fails, try standard accuracy
+            locationStatus.textContent = 'High accuracy failed, retrying with standard...';
+
+            navigator.geolocation.getCurrentPosition(
+                successCallback,
+                (finalError) => {
+                    getLocationBtn.disabled = false;
+                    getLocationBtn.textContent = '📍 Get My Live Location';
+
+                    let errorMsg = 'Unable to get location. ';
+                    if (finalError.code === finalError.PERMISSION_DENIED) {
+                        errorMsg += 'Please enable location permissions.';
+                    } else if (finalError.code === finalError.POSITION_UNAVAILABLE) {
+                        errorMsg += 'Location unavailable.';
+                    } else if (finalError.code === finalError.TIMEOUT) {
+                        errorMsg += 'Request timed out.';
+                    } else {
+                        errorMsg += 'Unknown error.';
+                    }
+
+                    locationStatus.textContent = '❌ ' + errorMsg;
+                    locationStatus.style.color = '#d32f2f';
+                    console.error('Final geolocation error:', finalError);
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 20000,
+                    maximumAge: 0 // Do not use cached position
                 }
+            );
+        };
 
-                locationStatus.textContent = '❌ ' + errorMsg;
-                locationStatus.style.color = '#d32f2f';
-                console.error('Geolocation error:', error);
+        // First attempt: High Accuracy
+        navigator.geolocation.getCurrentPosition(
+            successCallback,
+            errorCallback,
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
             }
         );
     });
